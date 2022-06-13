@@ -1,4 +1,4 @@
-import { Chocolate, Coffee, Tea } from './drink'
+import { Chocolate, Coffee, Orange, Tea } from './drink'
 import { formatForwardMessage, makeCommand } from './command'
 
 // We test the ability to create a command from a drink.
@@ -10,45 +10,64 @@ import { formatForwardMessage, makeCommand } from './command'
 // correlation when testing each flag computation.
 
 describe('Drink maker protocol', () => {
-  describe('[type flag] The drink maker should receive the correct instructions for my coffee/tea/chocolate order', () => {
-    it('flag tea in command', () => {
+  describe(`[type flag] The drink maker should receive the correct instructions for my
+   coffee/tea/chocolate/orange juice order`, () => {
+    it('tea', () => {
       expect(makeCommand(new Tea(0), 1).value).toBe('T::')
     })
 
-    it('flag coffee in command', () => {
+    it('coffee', () => {
       expect(makeCommand(new Coffee(0), 1).value).toBe('C::')
     })
 
-    it('flag chocolate in command', () => {
+    it('chocolate', () => {
       expect(makeCommand(new Chocolate(0), 1).value).toBe('H::')
+    })
+
+    it('orange juice', () => {
+      expect(makeCommand(new Orange(), 1).value).toBe('O::')
     })
   })
 
   describe('[sugar flag] I want to be able to send instructions to the drink maker to add one or two sugars', () => {
-    it('flag no sugar', () => {
+    it('no sugar', () => {
       expect(makeCommand(new Tea(0), 1).value).toBe('T::')
     })
 
-    it('flag 1 sugar', () => {
+    it('1 sugar', () => {
       expect(makeCommand(new Tea(1), 1).value).toBe('T:1:0')
     })
 
-    it('flag 2 sugars', () => {
+    it('2 sugars', () => {
       expect(makeCommand(new Tea(2), 1).value).toBe('T:2:0')
     })
   })
 
   describe('[stick flag] When my order contains sugar the drink maker should add a stick (touillette) with it', () => {
-    it('flag without stick when drink has no sugar', () => {
+    it('without stick when drink has no sugar', () => {
       expect(makeCommand(new Tea(0), 1).value).toBe('T::')
     })
 
-    it('flag with stick when drink has 1 sugar', () => {
+    it('with stick when drink has 1 sugar', () => {
       expect(makeCommand(new Tea(1), 1).value).toBe('T:1:0')
     })
 
-    it('flag with stick when drink has 2 sugars', () => {
+    it('with stick when drink has 2 sugars', () => {
       expect(makeCommand(new Tea(2), 1).value).toBe('T:2:0')
+    })
+  })
+
+  describe('[heat flag] I want to be able to have my coffee, chocolate or tea extra hot', () => {
+    it('extra hot coffee', () => {
+      expect(makeCommand(new Coffee(0, 'extra_hot'), 1).value).toBe('Ch::')
+    })
+
+    it('extra hot chocolate', () => {
+      expect(makeCommand(new Chocolate(1, 'extra_hot'), 1).value).toBe('Hh:1:0')
+    })
+
+    it('extra hot tea', () => {
+      expect(makeCommand(new Tea(2, 'extra_hot'), 1).value).toBe('Th:2:0')
     })
   })
 

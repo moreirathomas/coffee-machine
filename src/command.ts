@@ -2,11 +2,17 @@ import { DrinkOrder } from './drink'
 
 type TypeFlag = DrinkOrder['type']
 
+type HeatFlag = '' | 'h'
+
 type SugarFlag = '' | '1' | '2'
 
 type StickFlag = '' | '0'
 
-type Command = `${TypeFlag}:${SugarFlag}:${StickFlag}`
+type Command = `${TypeFlag}${HeatFlag}:${SugarFlag}:${StickFlag}`
+
+const parseHeatFlag = (heat: DrinkOrder['heat']): HeatFlag => {
+  return heat === 'extra_hot' ? 'h' : ''
+}
 
 const parseSugarFlag = (sugar: DrinkOrder['sugar']): SugarFlag => {
   switch (sugar) {
@@ -27,10 +33,11 @@ const seperator = ':' as const
 
 function formatFlags(
   type: TypeFlag,
+  heat: HeatFlag,
   sugar: SugarFlag,
   stick: StickFlag
 ): Command {
-  return `${type}${seperator}${sugar}${seperator}${stick}`
+  return `${type}${heat}${seperator}${sugar}${seperator}${stick}`
 }
 
 type MessageFlag = 'M'
@@ -61,11 +68,12 @@ export function makeCommand(drink: DrinkOrder, money: number): MaybeCommand {
     }
   }
 
+  const heatFlag = parseHeatFlag(drink.heat)
   const sugarFlag = parseSugarFlag(drink.sugar)
   const stickFlag = parseStickFlag(drink.isWithStick())
 
   return {
     type: 'command',
-    value: formatFlags(drink.type, sugarFlag, stickFlag),
+    value: formatFlags(drink.type, heatFlag, sugarFlag, stickFlag),
   }
 }
