@@ -23,9 +23,6 @@
       "jest-extended/all"
     ]
   },
-  "prettier": {
-    "printWidth": 120
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mathieueveillard/js-kata-starter.git"
