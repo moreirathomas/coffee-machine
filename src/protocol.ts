@@ -20,6 +20,12 @@ const sugarFlag: Record<Drink['sugar'], SugarFlag> = {
   2: '2',
 }
 
+const pricing: Record<Drink['type'], number> = {
+  tea: 0.4,
+  coffee: 0.6,
+  chocolate: 0.5,
+}
+
 const seperator = ':' as const
 
 function formatFlags(
@@ -30,7 +36,13 @@ function formatFlags(
   return `${type}${seperator}${sugar}${seperator}${stick}`
 }
 
-export function makeCommand(drink: Drink): Command {
+export function makeCommand(drink: Drink, money: number): Command {
+  if (money < pricing[drink.type]) {
+    throw new Error(
+      forwardMessage(`Not enough money: requires ${pricing[drink.type]} Euro`)
+    )
+  }
+
   const type = typeFlag[drink.type]
 
   const sugar = sugarFlag[drink.sugar]
