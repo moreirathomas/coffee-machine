@@ -1,5 +1,4 @@
 import { DrinkOrder } from './drink'
-import { forwardMessage } from './message'
 
 type TypeFlag = DrinkOrder['type']
 
@@ -34,15 +33,39 @@ function formatFlags(
   return `${type}${seperator}${sugar}${seperator}${stick}`
 }
 
-export function makeCommand(drink: DrinkOrder, money: number): Command {
+type MessageFlag = 'M'
+
+type Message = `${MessageFlag}:${string}`
+
+export function formatForwardMessage(message: string): Message {
+  return `M${seperator}${message}`
+}
+
+type MaybeCommand =
+  | {
+      type: 'command'
+      value: Command
+    }
+  | {
+      type: 'error'
+      value: Message
+    }
+
+export function makeCommand(drink: DrinkOrder, money: number): MaybeCommand {
   if (!drink.isEnough(money)) {
-    throw new Error(
-      forwardMessage(`Not enough money: requires ${drink.price} Euro`)
-    )
+    return {
+      type: 'error',
+      value: formatForwardMessage(
+        `Not enough money: requires ${drink.price} Euro`
+      ),
+    }
   }
 
   const sugarFlag = parseSugarFlag(drink.sugar)
   const stickFlag = parseStickFlag(drink.isWithStick())
 
-  return formatFlags(drink.type, sugarFlag, stickFlag)
+  return {
+    type: 'command',
+    value: formatFlags(drink.type, sugarFlag, stickFlag),
+  }
 }

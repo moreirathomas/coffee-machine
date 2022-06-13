@@ -1,5 +1,5 @@
 import { Chocolate, Coffee, Tea } from './drink'
-import { makeCommand } from './command'
+import { formatForwardMessage, makeCommand } from './command'
 
 // We test the ability to create a command from a drink.
 // The drink maker receives a command. This command is
@@ -12,43 +12,49 @@ import { makeCommand } from './command'
 describe('Drink maker protocol', () => {
   describe('[type flag] The drink maker should receive the correct instructions for my coffee/tea/chocolate order', () => {
     it('flag tea in command', () => {
-      expect(makeCommand(new Tea(0), 1)).toBe('T::')
+      expect(makeCommand(new Tea(0), 1).value).toBe('T::')
     })
 
     it('flag coffee in command', () => {
-      expect(makeCommand(new Coffee(0), 1)).toBe('C::')
+      expect(makeCommand(new Coffee(0), 1).value).toBe('C::')
     })
 
     it('flag chocolate in command', () => {
-      expect(makeCommand(new Chocolate(0), 1)).toBe('H::')
+      expect(makeCommand(new Chocolate(0), 1).value).toBe('H::')
     })
   })
 
   describe('[sugar flag] I want to be able to send instructions to the drink maker to add one or two sugars', () => {
     it('flag no sugar', () => {
-      expect(makeCommand(new Tea(0), 1)).toBe('T::')
+      expect(makeCommand(new Tea(0), 1).value).toBe('T::')
     })
 
     it('flag 1 sugar', () => {
-      expect(makeCommand(new Tea(1), 1)).toBe('T:1:0')
+      expect(makeCommand(new Tea(1), 1).value).toBe('T:1:0')
     })
 
     it('flag 2 sugars', () => {
-      expect(makeCommand(new Tea(2), 1)).toBe('T:2:0')
+      expect(makeCommand(new Tea(2), 1).value).toBe('T:2:0')
     })
   })
 
   describe('[stick flag] When my order contains sugar the drink maker should add a stick (touillette) with it', () => {
     it('flag without stick when drink has no sugar', () => {
-      expect(makeCommand(new Tea(0), 1)).toBe('T::')
+      expect(makeCommand(new Tea(0), 1).value).toBe('T::')
     })
 
     it('flag with stick when drink has 1 sugar', () => {
-      expect(makeCommand(new Tea(1), 1)).toBe('T:1:0')
+      expect(makeCommand(new Tea(1), 1).value).toBe('T:1:0')
     })
 
     it('flag with stick when drink has 2 sugars', () => {
-      expect(makeCommand(new Tea(2), 1)).toBe('T:2:0')
+      expect(makeCommand(new Tea(2), 1).value).toBe('T:2:0')
+    })
+  })
+
+  describe('[message flag] The drink make can deliver info messages to the customer if ordered so', () => {
+    it('flag message', () => {
+      expect(formatForwardMessage('Hello world')).toBe('M:Hello world')
     })
   })
 })
@@ -56,23 +62,21 @@ describe('Drink maker protocol', () => {
 describe('Pricing', () => {
   describe('The drink maker should make the drinks only if the correct amount of money is given', () => {
     it('correct amount of money', () => {
-      expect(() => makeCommand(new Tea(0), 0.4)).not.toThrow()
+      expect(makeCommand(new Tea(0), 0.4).type).toBe('command')
     })
 
     it('not enough money', () => {
-      expect(() => makeCommand(new Tea(0), 0)).toThrowError(
-        'M:Not enough money'
-      )
+      expect(makeCommand(new Tea(0), 0).type).toBe('error')
     })
 
     it('too much money', () => {
-      expect(() => makeCommand(new Tea(0), 1)).not.toThrow()
+      expect(makeCommand(new Tea(0), 1).type).toBe('command')
     })
   })
 
   describe(`If not enough money is provided, we want to send a message to the drink maker.
    The message should contain at least the amount of money missing`, () => {
-    expect(() => makeCommand(new Tea(0), 0)).toThrowError(
+    expect(makeCommand(new Tea(0), 0).value).toBe(
       'M:Not enough money: requires 0.4 Euro'
     )
   })
