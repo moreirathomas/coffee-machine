@@ -1,4 +1,5 @@
 import { DrinkOrder } from './drink'
+import { ShortageHandler } from './shortage'
 
 type TypeFlag = DrinkOrder['type']
 
@@ -58,13 +59,26 @@ type MaybeCommand =
       value: Message
     }
 
-export function makeCommand(drink: DrinkOrder, money: number): MaybeCommand {
+export function makeCommand(
+  drink: DrinkOrder,
+  money: number,
+  shortageHandler?: ShortageHandler
+): MaybeCommand {
   if (!drink.isEnough(money)) {
     return {
       type: 'error',
       value: formatForwardMessage(
         `Not enough money: requires ${drink.price} Euro`
       ),
+    }
+  }
+
+  if (shortageHandler && !shortageHandler.beverageQuantityChecker(drink)) {
+    shortageHandler.notifyMissingDrink(drink)
+
+    return {
+      type: 'error',
+      value: formatForwardMessage(`Shortage of ${drink.type}`),
     }
   }
 
