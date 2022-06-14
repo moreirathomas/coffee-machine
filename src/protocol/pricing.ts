@@ -1,4 +1,3 @@
-import { isEnoughIfGTE } from '../composables'
 import { ErrorCommand } from './command'
 import { DrinkOrder } from './drink'
 import { formatMessage } from './message'
@@ -14,12 +13,17 @@ const prices: Prices = {
   O: 0.6,
 }
 
+const isEnough = (moneyProvided: number, price: number): boolean =>
+  moneyProvided >= price
+
 export function inject(prices: Prices) {
   return (drink: DrinkOrder, money: number): ErrorCommand | OK => {
-    if (!isEnoughIfGTE(money, prices[drink.type])) {
+    if (!isEnough(money, prices[drink.type])) {
       return {
         type: 'error',
-        value: formatMessage(`Not enough money: requires ${drink.price} Euro`),
+        value: formatMessage(
+          `Not enough money: requires ${prices[drink.type]} Euro`
+        ),
       }
     }
 

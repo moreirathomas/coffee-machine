@@ -8,6 +8,15 @@ type Report = {
   totalEarned: number
 }
 
+type Prices = Record<DrinkOrder['type'], number>
+
+const prices: Prices = {
+  T: 0.4,
+  C: 0.6,
+  H: 0.5,
+  O: 0.6,
+}
+
 export class Repository {
   private drinks: Drinks = {
     T: 0,
@@ -20,7 +29,7 @@ export class Repository {
 
   add(drink: DrinkOrder): void {
     this.drinks[drink.type]++
-    this.totalEarned += drink.price
+    this.totalEarned += prices[drink.type]
   }
 
   peek(): Report {
