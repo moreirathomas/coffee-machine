@@ -1,5 +1,5 @@
 import { DrinkOrder } from './drink'
-import { formatForwardMessage, Message } from './message'
+import { Message } from './message'
 
 type TypeFlag = DrinkOrder['type']
 
@@ -51,16 +51,9 @@ export type MaybeCommand =
       value: Message
     }
 
-export function makeCommand(drink: DrinkOrder, money: number): MaybeCommand {
-  if (!drink.isEnough(money)) {
-    return {
-      type: 'error',
-      value: formatForwardMessage(
-        `Not enough money: requires ${drink.price} Euro`
-      ),
-    }
-  }
+export type ErrorCommand = Exclude<MaybeCommand, { type: 'command' }>
 
+export function makeCommand(drink: DrinkOrder): MaybeCommand {
   const heatFlag = parseHeatFlag(drink.heat)
   const sugarFlag = parseSugarFlag(drink.sugar)
   const stickFlag = parseStickFlag(drink.isWithStick())

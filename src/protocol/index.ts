@@ -1,21 +1,24 @@
-import { makeCommand as make, MaybeCommand } from './command'
+import { makeCommand as makeCommandFinal, MaybeCommand } from './command'
 import { DrinkOrder } from './drink'
-import { formatForwardMessage } from './message'
-import { inject, ShortageHandler } from './shortage'
+import { defaultPricingHandler } from './pricing'
+import { inject as injectShortage, ShortageHandler } from './shortage'
 
 export function makeCommand(
   drink: DrinkOrder,
   money: number,
   shortageHandler: ShortageHandler
 ): MaybeCommand {
-  const check = inject(shortageHandler)(drink)
+  const shortageCheck = injectShortage(shortageHandler)(drink)
 
-  if (check.type === 'error') {
-    return {
-      type: 'error',
-      value: formatForwardMessage(check.value),
-    }
+  if (shortageCheck.type === 'error') {
+    return shortageCheck
   }
 
-  return make(drink, money)
+  const moneyCheck = defaultPricingHandler(drink, money)
+
+  if (moneyCheck.type === 'error') {
+    return moneyCheck
+  }
+
+  return makeCommandFinal(drink)
 }

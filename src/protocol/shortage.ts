@@ -1,4 +1,6 @@
+import { ErrorCommand } from './command'
 import { DrinkOrder } from './drink'
+import { formatMessage } from './message'
 
 export interface ShortageHandler {
   beverageQuantityChecker(drink: DrinkOrder): boolean
@@ -6,16 +8,16 @@ export interface ShortageHandler {
   notifyMissingDrink(drink: DrinkOrder): void
 }
 
-type MaybeOK = { type: 'ok'; value: null } | { type: 'error'; value: string }
+type OK = { type: 'ok'; value: null }
 
 export function inject(handler: ShortageHandler) {
-  return (drink: DrinkOrder): MaybeOK => {
+  return (drink: DrinkOrder): ErrorCommand | OK => {
     if (handler && !handler.beverageQuantityChecker(drink)) {
       handler.notifyMissingDrink(drink)
 
       return {
         type: 'error',
-        value: `Shortage of ${drink.type}`,
+        value: formatMessage(`Shortage of ${drink.type}`),
       }
     }
 
