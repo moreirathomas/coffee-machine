@@ -1,8 +1,5 @@
-import { DrinkOrder } from './drink'
-
-interface Logger {
-  log(message?: any): void
-}
+import { DrinkOrder } from '../protocol/drink'
+import type { Logger } from './logger'
 
 type Drinks = Record<DrinkOrder['type'], number>
 

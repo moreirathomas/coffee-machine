@@ -1,5 +1,5 @@
 import { DrinkOrder } from './drink'
-import { ShortageHandler } from './shortage'
+import { formatForwardMessage, Message } from './message'
 
 type TypeFlag = DrinkOrder['type']
 
@@ -11,11 +11,11 @@ type StickFlag = '' | '0'
 
 type Command = `${TypeFlag}${HeatFlag}:${SugarFlag}:${StickFlag}`
 
-const parseHeatFlag = (heat: DrinkOrder['heat']): HeatFlag => {
+function parseHeatFlag(heat: DrinkOrder['heat']): HeatFlag {
   return heat === 'extra_hot' ? 'h' : ''
 }
 
-const parseSugarFlag = (sugar: DrinkOrder['sugar']): SugarFlag => {
+function parseSugarFlag(sugar: DrinkOrder['sugar']): SugarFlag {
   switch (sugar) {
     case 0:
       return ''
@@ -26,7 +26,7 @@ const parseSugarFlag = (sugar: DrinkOrder['sugar']): SugarFlag => {
   }
 }
 
-const parseStickFlag = (useStick: boolean): StickFlag => {
+function parseStickFlag(useStick: boolean): StickFlag {
   return useStick ? '0' : ''
 }
 
@@ -41,15 +41,7 @@ function formatFlags(
   return `${type}${heat}${seperator}${sugar}${seperator}${stick}`
 }
 
-type MessageFlag = 'M'
-
-type Message = `${MessageFlag}:${string}`
-
-export function formatForwardMessage(message: string): Message {
-  return `M${seperator}${message}`
-}
-
-type MaybeCommand =
+export type MaybeCommand =
   | {
       type: 'command'
       value: Command
@@ -59,26 +51,13 @@ type MaybeCommand =
       value: Message
     }
 
-export function makeCommand(
-  drink: DrinkOrder,
-  money: number,
-  shortageHandler?: ShortageHandler
-): MaybeCommand {
+export function makeCommand(drink: DrinkOrder, money: number): MaybeCommand {
   if (!drink.isEnough(money)) {
     return {
       type: 'error',
       value: formatForwardMessage(
         `Not enough money: requires ${drink.price} Euro`
       ),
-    }
-  }
-
-  if (shortageHandler && !shortageHandler.beverageQuantityChecker(drink)) {
-    shortageHandler.notifyMissingDrink(drink)
-
-    return {
-      type: 'error',
-      value: formatForwardMessage(`Shortage of ${drink.type}`),
     }
   }
 

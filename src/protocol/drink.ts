@@ -1,19 +1,21 @@
-import { WithHeat } from './heat'
-import { computeIsEnough, WithPrice } from './price'
-import { computeIsWithStick, WithSugar } from './sugar'
+import { isEnoughIfGTE, withStickIfSugar } from '../composables'
+import type { WithHeat, WithPrice, WithSugar } from '../composables'
+
+type Type = 'T' | 'C' | 'H' | 'O'
 
 interface Drink {
-  type: 'T' | 'C' | 'H' | 'O'
+  type: Type
 }
 
 export type DrinkOrder = Drink & WithSugar & WithPrice & WithHeat
 
+// Below are all the drinks that can be ordered via the drink maker protocol.
+
 export class Tea implements DrinkOrder {
   readonly type = 'T'
   readonly price = 0.4
-  // TODO Explicit type constraints?
-  sugar
-  heat
+  readonly sugar
+  readonly heat
 
   constructor(sugar: 0 | 1 | 2, heat?: 'hot' | 'extra_hot') {
     this.sugar = sugar
@@ -21,20 +23,19 @@ export class Tea implements DrinkOrder {
   }
 
   isWithStick(): boolean {
-    return computeIsWithStick(this.sugar)
+    return withStickIfSugar(this.sugar)
   }
 
   isEnough(money: number): boolean {
-    return computeIsEnough(money, this.price)
+    return isEnoughIfGTE(money, this.price)
   }
 }
 
 export class Coffee implements DrinkOrder {
   readonly type = 'C'
   readonly price = 0.6
-  // TODO Explicit type constraints?
-  sugar
-  heat
+  readonly sugar
+  readonly heat
 
   constructor(sugar: 0 | 1 | 2, heat: 'hot' | 'extra_hot' = 'hot') {
     this.sugar = sugar
@@ -42,20 +43,19 @@ export class Coffee implements DrinkOrder {
   }
 
   isWithStick(): boolean {
-    return computeIsWithStick(this.sugar)
+    return withStickIfSugar(this.sugar)
   }
 
   isEnough(money: number): boolean {
-    return computeIsEnough(money, this.price)
+    return isEnoughIfGTE(money, this.price)
   }
 }
 
 export class Chocolate implements DrinkOrder {
   readonly type = 'H'
   readonly price = 0.5
-  // TODO Explicit type constraints?
-  sugar
-  heat
+  readonly sugar
+  readonly heat
 
   constructor(sugar: 0 | 1 | 2, heat: 'hot' | 'extra_hot' = 'hot') {
     this.sugar = sugar
@@ -63,11 +63,11 @@ export class Chocolate implements DrinkOrder {
   }
 
   isWithStick(): boolean {
-    return computeIsWithStick(this.sugar)
+    return withStickIfSugar(this.sugar)
   }
 
   isEnough(money: number): boolean {
-    return computeIsEnough(money, this.price)
+    return isEnoughIfGTE(money, this.price)
   }
 }
 
@@ -82,6 +82,6 @@ export class Orange implements DrinkOrder {
   }
 
   isEnough(money: number): boolean {
-    return computeIsEnough(money, this.price)
+    return isEnoughIfGTE(money, this.price)
   }
 }

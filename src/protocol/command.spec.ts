@@ -1,5 +1,6 @@
 import { Chocolate, Coffee, Orange, Tea } from './drink'
-import { formatForwardMessage, makeCommand } from './command'
+import { makeCommand } from './command'
+import { formatForwardMessage } from './message'
 
 // We test the ability to create a command from a drink.
 // The drink maker receives a command. This command is

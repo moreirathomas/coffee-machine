@@ -1,5 +1,5 @@
-import { Chocolate, Coffee, Orange, Tea } from './drink'
-import { Repository } from './report'
+import { Chocolate, Coffee, Tea } from '../protocol/drink'
+import { Repository } from '.'
 
 describe('Reporting', () => {
   describe(`I want to be able to print a report anytime that contains:
